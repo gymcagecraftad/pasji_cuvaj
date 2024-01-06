@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "83222226135",
+    "project_id": "pasji-cuvaj",
+    "storage_bucket": "pasji-cuvaj.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:83222226135:android:df699865d63f9cf0543c92",
+        "android_client_info": {
+          "package_name": "com.example.pasji_cuvaj"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCd8RQN4P4flV-t9EfsLZoN1aa6e-6edNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
