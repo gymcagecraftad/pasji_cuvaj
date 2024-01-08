@@ -31,6 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             setState(() {
             });
           },
+          myevent: false,
         ),
       ),
       body: Padding(
@@ -91,7 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 if (user != null) {
                   Navigator.pushNamedAndRemoveUntil(
                     context,
-                    '/home',
+                    '/guardian_event_screen',
                     (route) => false,
                   );;
                 } else {

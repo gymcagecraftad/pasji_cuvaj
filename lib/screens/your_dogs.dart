@@ -39,8 +39,7 @@ class _YourDogsState extends State<YourDogs> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            // Zamenjajte '/home' s potjo vašega ciljnega zaslona
-            Navigator.pushReplacementNamed(context, '/home');
+            Navigator.pop(context);
           },
         ),
 

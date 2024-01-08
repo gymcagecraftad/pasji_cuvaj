@@ -43,6 +43,7 @@ class AuthProvider {
         'name': name,
         'surname': surname,
         'username': username,
+        'email': email
       });
 
       return user;

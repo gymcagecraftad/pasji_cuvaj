@@ -28,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
             setState(() {
             });
           },
+          myevent: false,
         ),
       ),
       body: Padding(
@@ -57,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 if (user != null) {
                    Navigator.pushNamedAndRemoveUntil(
                     context,
-                    '/home',
+                    '/guardian_event_screen',
                     (route) => false,
                   );
                 } else {

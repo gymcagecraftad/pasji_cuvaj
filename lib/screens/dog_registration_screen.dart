@@ -145,9 +145,12 @@ class _DogSubmissionScreenState extends State<DogSubmissionScreen> {
         print('Selected Date Range: $fromDate to $toDate');
         // Continue with dog submission logic...
 
-        // Add logic to save the data to the 'event_registered_dogs' table
-        // ...
-
+        await DatabaseProvider().submitDogToEvent(
+            eventID: widget.eventID,
+            dogID: selectedDogId!,
+            fromDate: fromDate.toString(),
+            toDate: toDate.toString(),
+          );
         // Update the event by decrementing maxDogs
         await DatabaseProvider().updateEventMaxDogs(widget.eventID);
         // After saving the data and updating the event, navigate back to the home screen

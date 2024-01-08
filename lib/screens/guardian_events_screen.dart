@@ -5,6 +5,8 @@ import 'package:pasji_cuvaj/widgets/auth_control_widget.dart';
 import 'package:pasji_cuvaj/providers/database_provider.dart';
 import 'package:pasji_cuvaj/models/guardian_event.dart';
 import 'dog_registration_screen.dart';
+import 'package:pasji_cuvaj/widgets/bottom_navigation_bar.dart';
+
 
 
 class GuardianEventScreen extends StatefulWidget {
@@ -12,14 +14,242 @@ class GuardianEventScreen extends StatefulWidget {
   _GuardianEventScreenState createState() => _GuardianEventScreenState();
 }
 
-class _GuardianEventScreenState extends State<GuardianEventScreen> {
-  final AuthProvider authProvider = AuthProvider();
-  final DatabaseProvider databaseProvider = DatabaseProvider();
+class RegionDropdown extends StatefulWidget {
+  final Function(String?) onRegionChanged;
 
+  const RegionDropdown({Key? key, required this.onRegionChanged}) : super(key: key);
+
+  @override
+  _RegionDropdownState createState() => _RegionDropdownState();
+}
+
+class _RegionDropdownState extends State<RegionDropdown> {
+  String? selectedRegion;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+      hint: Text('Region'),
+      value: selectedRegion,
+      items: [
+        'Pomurska regija',
+        'Podravska regija',
+        'Koroška regija',
+        'Savinjska regija',
+        'Zasavska regija',
+        'Posavska regija',
+        'Jugovzhodna Slovenija',
+        'Osrednjeslovenska regija',
+        'Gorenjska regija',
+        'Primorsko-notranjska regija',
+        'Goriška regija',
+        'Obalno-kraška regija',
+      ].map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          selectedRegion = value;
+        });
+        widget.onRegionChanged(value);
+      },
+    );
+  }
+}
+class OrderByDropdown extends StatefulWidget {
+  final Function(String?) onOrderByChanged;
+
+  const OrderByDropdown({Key? key, required this.onOrderByChanged}) : super(key: key);
+
+  @override
+  _OrderByDropdownState createState() => _OrderByDropdownState();
+}
+
+class _OrderByDropdownState extends State<OrderByDropdown> {
+  String? selectedOrderBy;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+      hint: Text('Order By'),
+      value: selectedOrderBy,
+      onChanged: (String? value) {
+        setState(() {
+          selectedOrderBy = value;
+        });
+        widget.onOrderByChanged(value);
+      },
+      items: [
+        'No Order',
+        'Price Ascending',
+        'Price Descending',
+      ].map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
+  }
+}
+class DateRangePicker extends StatefulWidget {
+  final Function(DateTime?, DateTime?) onDateRangeChanged;
+
+  const DateRangePicker({Key? key, required this.onDateRangeChanged}) : super(key: key);
+
+  @override
+  _DateRangePickerState createState() => _DateRangePickerState();
+}
+
+class _DateRangePickerState extends State<DateRangePicker> {
+  DateTime? selectedFromDate;
+  DateTime? selectedToDate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('From Date:'),
+            ElevatedButton(
+              onPressed: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2101),
+                );
+                if (pickedDate != null) {
+                  setState(() {
+                    selectedFromDate = pickedDate;
+                  });
+                  widget.onDateRangeChanged(selectedFromDate, selectedToDate);
+                }
+              },
+              child: Text(selectedFromDate != null
+                  ? DateFormat('yyyy-MM-dd').format(selectedFromDate!)
+                  : 'Select Date'),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('To Date:'),
+            ElevatedButton(
+              onPressed: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2101),
+                );
+                if (pickedDate != null) {
+                  setState(() {
+                    selectedToDate = pickedDate;
+                  });
+                  widget.onDateRangeChanged(selectedFromDate, selectedToDate);
+                }
+              },
+              child: Text(selectedToDate != null
+                  ? DateFormat('yyyy-MM-dd').format(selectedToDate!)
+                  : 'Select Date'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _GuardianEventScreenState extends State<GuardianEventScreen> {
+  GlobalKey<_RegionDropdownState> regionDropdownKey = GlobalKey<_RegionDropdownState>();
+  GlobalKey<_OrderByDropdownState> orderByDropdownKey = GlobalKey<_OrderByDropdownState>();
+  GlobalKey<_DateRangePickerState> dateRangePickerKey = GlobalKey<_DateRangePickerState>();  final AuthProvider authProvider = AuthProvider();
+  final DatabaseProvider databaseProvider = DatabaseProvider();
+  int _selectedIndex = 0;
   String _formatDate(String date) {
     DateTime dateTime = DateTime.parse(date);
     return DateFormat('yyyy-MM-dd').format(dateTime);
   }
+  String? orderBy;
+  String? region;
+  DateTime? fromDate;
+  DateTime? toDate;
+  Future<void> showFilterDialog() async {
+    String? selectedOrderBy;
+    String? selectedRegion;
+    DateTime? selectedFromDate;
+    DateTime? selectedToDate;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Filter Events'),
+          content: Column(
+            children: <Widget>[
+              OrderByDropdown(
+                key: orderByDropdownKey,
+                onOrderByChanged: (value) {
+                  orderByDropdownKey.currentState?.setState(() {
+                    // any state changes you want before the rebuild
+                  });
+                  selectedOrderBy = value;
+                },
+              ),
+              RegionDropdown(
+                key: regionDropdownKey,
+                onRegionChanged: (value) {
+                  regionDropdownKey.currentState?.setState(() {
+                    // any state changes you want before the rebuild
+                  });          
+                  selectedRegion = value;
+                },
+              ),
+              DateRangePicker(
+                key: dateRangePickerKey,
+                onDateRangeChanged: (fromDate, toDate) {
+                  dateRangePickerKey.currentState?.setState(() {
+                    // any state changes you want before the rebuild
+                  });
+                  selectedFromDate = fromDate;
+                  selectedToDate = toDate;
+                },
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Apply'),
+              onPressed: () {
+                setState(() {
+                  // Pass selected filters and date range to the getAllGuardianEventsWithUserData method
+                  databaseProvider.getAllGuardianEventsWithUserData(
+                    orderBy: selectedOrderBy,
+                    region: selectedRegion,
+                    fromDate: selectedFromDate,
+                    toDate: selectedToDate,
+                  );
+                });
+                orderBy = selectedOrderBy;
+                region = selectedRegion;
+                fromDate = selectedFromDate;
+                toDate = selectedToDate;
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +263,10 @@ class _GuardianEventScreenState extends State<GuardianEventScreen> {
           onLogout: () async {
             await authProvider.signOut();
             setState(() {
-              // Trigger a rebuild of the HomeScreen widget
+              _selectedIndex = 0;
             });
           },
+          myevent: false,
         ),
       ),
       body: Padding(
@@ -51,26 +282,35 @@ class _GuardianEventScreenState extends State<GuardianEventScreen> {
                 color: Colors.deepPurple,
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: showFilterDialog,
+                  child: Text('Filter'),
+                ),
+              ],
+            ),
             SizedBox(height: 20),
             Expanded(
               child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: databaseProvider.getAllGuardianEventsWithUserData(),
+                future: databaseProvider.getAllGuardianEventsWithUserData(orderBy: orderBy, region: region, fromDate: fromDate, toDate: toDate),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+                    return const Center(
+                      child: RefreshProgressIndicator(),
+                    );
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return Text('No guardian events available.');
                   } else {
                     List<Map<String, dynamic>> events = snapshot.data!;
-
                   return ListView.builder(
                     itemCount: events.length,
                     itemBuilder: (context, index) {
                       GuardianEvent event = events[index]['event'];
                       String userName = events[index]['userName'];
-
                       if (event.maxDogs > 0 && DateTime.parse(event.toDate).isAfter(DateTime.now())) {
                         return Card(
                           elevation: 2.0,
@@ -142,6 +382,13 @@ class _GuardianEventScreenState extends State<GuardianEventScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: isLoggedIn ? CustomBottomNavigationBar(
+        selectedIndex: _selectedIndex,
+        onTabTapped: (index) {
+          setState(() {
+          });
+        },
+      ) : null,
     );
   }
 }

@@ -25,6 +25,7 @@ class _EventScreenState extends State<EventScreen>{
               // Trigger a rebuild of the HomeScreen widget
             });
           },
+          myevent: false,
         ),
       ),
       body: Padding(

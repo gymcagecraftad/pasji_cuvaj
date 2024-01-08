@@ -60,7 +60,7 @@ class _CreateGuardianEventScreenState extends State<CreateGuardianEventScreen> {
                 child: Text(
                   _selectedToDate == null
                       ? 'Select To Date'
-                      : 'To: ${_selectedToDate!.toLocal()}',
+                      : 'To: ${DateFormat('yyyy-MM-dd').format(_selectedToDate!)}',
                 ),
               ),
               SizedBox(height: 10),
@@ -217,7 +217,7 @@ class _CreateGuardianEventScreenState extends State<CreateGuardianEventScreen> {
                     await guardianEventProvider.createGuardianEvent(event);
 
                     // Navigate back to the HomeScreen
-                    Navigator.pop(context);
+                    Navigator.pushNamedAndRemoveUntil(context, '/my_guardian_events_screen',(route) => false,);
                   }
                 },
                 child: Text('Create Event'),
